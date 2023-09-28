@@ -1,4 +1,5 @@
 const express = require('express')
+const { blogs } = require('./model/index')
 const app = express()
 
 // database connection
@@ -12,8 +13,13 @@ app.set("view engine","ejs")
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 //all blog
-app.get("/",(req,res)=>{
-    res.render("blogs")
+app.get("/",async (req,res)=>{
+    // blogs vanne table bata vaye jati sabai data dey
+    const allBlogs = await blogs.findAll() 
+    console.log(allBlogs)
+
+    //blogs vanney key/name ma allBlogs/data pass gareko ejs file lai
+    res.render('blogs',{blogs:allBlogs})
 })
 
 
@@ -24,12 +30,29 @@ app.get("/createBlog",(req,res)=>{
 })
 
 //createBlog Post
-app.post("/createBlog",(req,res)=>{
-    console.log(req.body.title) 
-    res.send("form submitted successfully")
+app.post("/createBlog",async (req,res)=>{
+    //first approach
+    const title = req.body.title
+    const description = req.body.description
+    const subTitle = req.body.subtitle
+   
+    //database ma halnu paryo
+   await blogs.create({
+        title: title,
+        subTitle: subTitle,
+        description: description
+    })
+    //second approach
+    
+
+    //database ma halnu paryo
+
+    res.redirect("/")
 })
 
 
+
+//database/table bata data kasari nikalney
 
 
 app.listen(3000,()=>{
